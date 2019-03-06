@@ -8,7 +8,7 @@ router.get('/fetchGenres', booksController.getGenres);
 router.get('/fetchFormats', booksController.getFormats);
 router.get('/fetchLastBook', booksController.getLastBook);
 router.post('/saveBook', booksController.saveBook);
-router.post('/viewBook', booksController.viewBook);
+router.get('/viewBook/:id', booksController.viewBook);
 router.post('/updateBook', booksController.updateBook);
 router.delete('/deleteBook', booksController.deleteBook);
 

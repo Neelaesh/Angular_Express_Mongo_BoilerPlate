@@ -57,9 +57,9 @@ export class BookStoreService{
         );
     }
 
-    getBook(book): Observable<any>{
-        console.log("View book ",book);
-        return this.http.post(this.endpoint + 'viewBook', JSON.stringify(book), this.httpOptions).
+    getBook(bookId): Observable<any>{
+        console.log("View book ",bookId);
+        return this.http.get(this.endpoint + 'viewBook/' + bookId).
         pipe(tap(book => console.log(`View Book ${book}`)),
         catchError(this.handleError('viewBook'))
         );

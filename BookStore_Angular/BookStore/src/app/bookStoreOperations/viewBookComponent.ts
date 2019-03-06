@@ -12,7 +12,7 @@ import { BookStoreService } from '../bookStoreData/bookStoreService';
 
 export class ViewBookComponent implements OnInit{
 
-    allBookDetails : any[];
+    //allBookDetails : any[];
     id : any;
     title : any;
     author : any;
@@ -35,7 +35,7 @@ export class ViewBookComponent implements OnInit{
             this.id = params['id'];
             console.log("Book ID: ",this.id);
         });
-        this.getBooks();
+        //this.getBooks();
         this.getBook(this.id);
     }
 
@@ -43,7 +43,7 @@ export class ViewBookComponent implements OnInit{
         this.location.back();
     }
 
-    getBooks() {
+    /* getBooks() {
         this._bookStoreServices.getBooks().subscribe((data ) => {
             this.allBookDetails = data;
             console.log("Books from Express ",this.allBookDetails);
@@ -52,14 +52,11 @@ export class ViewBookComponent implements OnInit{
             console.log("Error while fetching Books");
         }
         );
-    }
+    } */
 
     getBook(bookId){
-        let book = {};
-        book['id'] = bookId;
-        this._bookStoreServices.getBook(book).subscribe((data) => {
+        this._bookStoreServices.getBook(bookId).subscribe((data) => {
             this.bookDetail = data;
-            console.log(this.bookDetail);
             this.title = data.title;
             this.author = data.author;
             this.isbn = data.isbn;

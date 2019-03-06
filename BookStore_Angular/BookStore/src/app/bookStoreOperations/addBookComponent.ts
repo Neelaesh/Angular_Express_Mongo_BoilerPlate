@@ -53,7 +53,7 @@ export class AddBookComponent implements OnInit{
     addBook(form){
 
         console.log("Add New Book Contents ",form);
-        let newId = Number(this.lastBookId) + Number(1);
+        let newId = (Number(this.lastBookId) + Number(1)).toString();
         let newBook = {
             id: newId,
             title: form.title,

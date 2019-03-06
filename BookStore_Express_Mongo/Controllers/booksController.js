@@ -107,12 +107,13 @@ module.exports.viewBook = (req,res) => {
         if(err)
             console.log("Error Occurred while connecting ",err);
         else{
-            console.log("Book ID to be searched ",req.body.id);
+            console.log("Book ID to be searched ",req.params.id);
             let viewBook;
-            db.collection('books').findOne({ id: req.body.id}, { useNewUrlParser: true },function(err,data){
+            let bookId = req.params.id;
+            db.collection('books').findOne({ id: bookId}, { useNewUrlParser: true },function(err,data){
                 viewBook=data;
-                console.log("Book Result ",viewBook);
-                res.send(viewBook);
+                console.log("Book Result ",data);
+                res.send(data);
             }); 
         }
     });
