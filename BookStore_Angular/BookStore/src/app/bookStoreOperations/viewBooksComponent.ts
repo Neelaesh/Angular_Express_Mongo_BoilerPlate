@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { BookStoreCustomViewService } from '../bookStoreData/bookStoreCustomView.service';
 import { BookStoreService } from '../bookStoreData/bookStoreService';
@@ -26,9 +26,10 @@ export class ViewBooksComponent implements OnInit{
         format : true
     };
     genresList: any[];
+    booksDeleted: number;
 
     constructor(private route : Router, private _bookStoreCustomViewService : BookStoreCustomViewService,
-    private _bookStoreServices : BookStoreService){
+    private _bookStoreServices : BookStoreService, private activatedRoute : ActivatedRoute){
         
     }
 
@@ -70,11 +71,14 @@ export class ViewBooksComponent implements OnInit{
                 console.log("Books to Delete ",booksToDelete);
                 this._bookStoreServices.deleteBook(booksToDelete).subscribe(
                     (data) => {
-                        this.books = data;
-                        console.log("Remaining Books ",this.books);
+                        this.booksDeleted = data.n; 
+                        console.log("Books Deleted ",this.booksDeleted);
+                        this.selectedBooks = [];
+                        this.route.navigate(['/books'],{ relativeTo: this.activatedRoute });
                     },
                     (error) => {
                         console.log("Error while Deleting book");
+                        this.selectedBooks = [];
                     }
                 );
                 booksArray = this.selectedBooks.split(',');
@@ -87,15 +91,16 @@ export class ViewBooksComponent implements OnInit{
                 console.log("Book to Delete ",this.selectedBooks);
                 this._bookStoreServices.deleteBook(this.selectedBooks).subscribe(
                     (data) => {
-                        this.books = data;
-                        console.log("Remaining Books ",this.books);
+                        this.booksDeleted = data.n; 
+                        console.log("Books Deleted ",this.booksDeleted);
+                        this.selectedBooks = [];
+                        this.route.navigate(['/books']);
                     },
                     (error) => {
                         console.log("Error while Deleting book");
+                        this.selectedBooks = [];
                     }
                 ); 
-                this.getBooks();
-                this.selectedBooks = [];
             }
         }
         else{

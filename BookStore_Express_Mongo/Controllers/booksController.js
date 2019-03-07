@@ -5,15 +5,15 @@ var config = require('../Configurations/config');
 module.exports.getBooks = (req,res) => {
 
     mongoClient.connect(config.mongourl,{ useNewUrlParser: true },function(err,client){
-        const db = client.db(config.dbname);
+        const dbo = client.db(config.dbname);
         if(err){
             console.log("Error Occurred while connecting ",err);
             res.send(err);
         }
         else{
-            db.collection('books').find().toArray(function(error,results){
-                if(error)
-                    console.log("Error Occurred while fetching ",error);
+            dbo.collection('books').find().toArray(function(error,results){
+                if (error) throw error;
+                client.close();
                 //console.log("Books ",results);
                 res.send(results);
             });
@@ -24,15 +24,15 @@ module.exports.getBooks = (req,res) => {
 module.exports.getGenres = (req,res) => {
 
     mongoClient.connect(config.mongourl,{ useNewUrlParser: true },function(err,client){
-        const db = client.db(config.dbname);
+        const dbo = client.db(config.dbname);
         if(err){
             console.log("Error Occurred while connecting ",err);
             res.send(err);
         }
         else{
-            db.collection('genres').find().toArray(function(error,results){
-                if(error)
-                    console.log("Error Occurred while fetching ",error);
+            dbo.collection('genres').find().toArray(function(error,results){
+                if (error) throw error;
+                client.close();
                 //console.log("Genres ",results);
                 res.send(results);
             });
@@ -43,15 +43,15 @@ module.exports.getGenres = (req,res) => {
 module.exports.getFormats = (req,res) => {
 
     mongoClient.connect(config.mongourl,{ useNewUrlParser: true },function(err,client){
-        const db = client.db(config.dbname);
+        const dbo = client.db(config.dbname);
         if(err){
             console.log("Error Occurred while connecting ",err);
             res.send(err);
         }
         else{
-            db.collection('formats').find().toArray(function(error,results){
-                if(error)
-                    console.log("Error Occurred while fetching ",error);
+            dbo.collection('formats').find().toArray(function(error,results){
+                if (error) throw error;
+                client.close();
                 //console.log("Formats ",results);
                 res.send(results);
             });
@@ -62,18 +62,18 @@ module.exports.getFormats = (req,res) => {
 module.exports.getLastBook = (req,res) => {
 
     mongoClient.connect(config.mongourl,{ useNewUrlParser: true },function(err,client){
-        const db = client.db(config.dbname);
+        const dbo = client.db(config.dbname);
         if(err){
             console.log("Error Occurred while connecting ",err);
             res.send(err);
         }
         else{
-            db.collection('books').find({}).sort({$natural:-1}).limit(1).toArray(function(error,results){
-                if(error)
-                    console.log("Error Occurred while fetching ",error);
+            dbo.collection('books').find({}).sort({$natural:-1}).limit(1).toArray(function(error,results){
+                if (error) throw error;
+                client.close();
                 //console.log("Last Book Array ",results);
                 let resultObj = {...results};
-                console.log("Last Book Object ",resultObj['0']);
+                //console.log("Last Book Object ",resultObj['0']);
                 res.send(resultObj['0']);
             });
         }
@@ -83,37 +83,36 @@ module.exports.getLastBook = (req,res) => {
 module.exports.saveBook = (req,res) => {
 
     mongoClient.connect(config.mongourl, { useNewUrlParser: true }, function(err,client){
-        const db= client.db(config.dbname);
+        const dbo= client.db(config.dbname);
         if(err){
             console.log("Error Occurred while connecting ",err);
+            res.send(err);
         }
         else{
-            db.collection('books').insertOne(req.body, function(error, results){
-            if(error)
-                console.log("Error Occurred while fetching ",error);
-            else
-                console.log("Success ",results.ops);
-                res.send(results.ops);
+            //console.log("Book to Insert ",req.body);
+            dbo.collection('books').insertOne(req.body, { useNewUrlParser: true }, function(error, results){
+            if (error) throw error;
+            client.close();
+            res.send(results.ops);
             });
         }
     });
-    console.log(req.body);
 }
 
 module.exports.viewBook = (req,res) => {
 
     mongoClient.connect(config.mongourl, function(err,client){
-        const db = client.db(config.dbname);
-        if(err)
+        const dbo = client.db(config.dbname);
+        if(err){
             console.log("Error Occurred while connecting ",err);
+            res.send(err);
+        }
         else{
-            console.log("Book ID to be searched ",req.params.id);
-            let viewBook;
-            let bookId = req.params.id;
-            db.collection('books').findOne({ id: bookId}, { useNewUrlParser: true },function(err,data){
-                viewBook=data;
-                console.log("Book Result ",data);
-                res.send(data);
+            //console.log("Book ID to be searched ",req.params.id);
+            dbo.collection('books').findOne({ id: req.params.id}, { useNewUrlParser: true }, function(error,results){
+                if (error) throw error;
+                client.close();
+                res.send(results);
             }); 
         }
     });
@@ -121,13 +120,15 @@ module.exports.viewBook = (req,res) => {
 
 module.exports.updateBook = (req,res) => {
 
-    mongoClient.connect(config.mongourl, function(err, client){
-        const db = client.db(config.dbname);
-        if(err)
+    mongoClient.connect(config.mongourl, { useNewUrlParser: true }, function(err, client){
+        const dbo = client.db(config.dbname);
+        if(err){
             console.log("Error Occurred while connecting ",err);
+            res.send(err);
+        }
         else{
-            console.log("Book ID to be updated ",req.body.id);
-            db.collection('books').findOneAndUpdate(
+            //console.log("Book ID to be updated ",req.body.id);
+            dbo.collection('books').findOneAndUpdate(
                 { id: req.body.id },
                 {
                     $set: { 
@@ -145,7 +146,8 @@ module.exports.updateBook = (req,res) => {
                     upsert: true
                 },
                 function(error, results){
-                    console.log("Updated Book ",results);
+                    if (error) throw error;
+                    client.close();
                     res.send(results);
                 }
             );
@@ -156,32 +158,18 @@ module.exports.updateBook = (req,res) => {
 module.exports.deleteBook = (req,res) => {
 
     mongoClient.connect(config.mongourl, function(err,client){
-        const db = client.db(config.name);
-        if(err)
+        const dbo = client.db(config.dbname);
+        if(err){
             console.log("Error Occurred while connecting ",err);
+            res.send(err);
+        }
         else{
-            console.log("Book ID to be deleted ",req.body.id);
-            var id = req.body.id;
-            /* db.collection('books').deleteOne({  _id : objectId(id) }, function(err, results){
-                if (err) return res.send(500, err)
-                  console.log(results);
-                  res.send('A darth vader quote got deleted')
-            }); */
-            /* db.collection('books').findOneAndDelete({id: req.body.id}, 
-                (err, result) => {
-                  if (err) return res.send(500, err)
-                  console.log(result);
-                  res.send('A darth vader quote got deleted')
-            }); */
-            db.collection('books', function(err, collection) {
-                collection.deleteOne({_id: objectId('5c663f8e0e77e616887815e7')}, function(err, results) {
-                    if (err){
-                      console.log("failed");
-                      throw err;
-                    }
-                    console.log("success",results);
-                 });
-             });
+            console.log("Book IDs to be deleted ",req.body);
+            dbo.collection("books").deleteMany({ id : { $in : req.body } }, function(error, results) {
+                if (error) throw error;
+                client.close();
+                res.send(results);
+            });
         }
     });
 }

@@ -10,6 +10,6 @@ router.get('/fetchLastBook', booksController.getLastBook);
 router.post('/saveBook', booksController.saveBook);
 router.get('/viewBook/:id', booksController.viewBook);
 router.post('/updateBook', booksController.updateBook);
-router.delete('/deleteBook', booksController.deleteBook);
+router.post('/deleteBook', booksController.deleteBook);
 
 module.exports = router;
